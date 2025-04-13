@@ -1,0 +1,28 @@
+{% extends "transactions/references/base.html" %}
+
+{% block title %}Удаление {{ model_meta.verbose_name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Подтверждение удаления</h4>
+    </div>
+    
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <p>Вы уверены, что хотите удалить {{ model_meta.verbose_name }} <strong>{{ object.name }}</strong>?</p>
+            <p class="text-danger">Это действие нельзя отменить!</p>
+            
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Удалить
+                </button>
+                <a href="{% url view.list_url_name %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

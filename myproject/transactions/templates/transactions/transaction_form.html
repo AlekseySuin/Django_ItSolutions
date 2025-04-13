@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Редактирование транзакции{% else %}Создание транзакции{% endif %}{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Динамическое обновление подкатегорий при изменении категории
+    $('#id_category').change(function() {
+        const categoryId = $(this).val();
+        if (categoryId) {
+            $.ajax({
+                url: '{% url "load_subcategories" %}',
+                data: {
+                    'category_id': categoryId
+                },
+                success: function(data) {
+                    $('#id_subcategory').html(data);
+                }
+            });
+        } else {
+            $('#id_subcategory').html('<option value="">---------</option>');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        {% if object %}Редактирование транзакции{% else %}Создание транзакции{% endif %}
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form.record_date.label_tag }}
+                    {{ form.record_date }}
+                    {% if form.record_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.record_date.errors.as_text }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.transaction_type.label_tag }}
+                    {{ form.transaction_type }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.amount.label_tag }}
+                    {{ form.amount }}
+                    {% if form.amount.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.amount.errors.as_text }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ form.category.label_tag }}
+                    {{ form.category }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.subcategory.label_tag }}
+                    {{ form.subcategory }}
+                </div>
+                <div class="col-12">
+                    {{ form.comment.label_tag }}
+                    {{ form.comment }}
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}Сохранить{% else %}Создать{% endif %}
+                    </button>
+                    <a href="{% url 'transaction_list' %}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
