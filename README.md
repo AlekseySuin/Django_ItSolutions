@@ -4,10 +4,14 @@
 # Как запустить проект?
 ## 1. Клонируйте проект
 ```
-git clone https://github.com/AlekseySuin/Django_ItSolutions
+git clone https://github.com/AlekseySuin/Django_ItSolutions.git
 ```
 cd ваш-репозиторий
-## 2. Запуск с помощью встроенного сервера
+## 2. Установите зависимости:
+```
+pip install -r requirements.txt
+```
+## 3. Запуск сервера
 Переходим в директорию проекта (myproject)
 ```
 cd myproject
