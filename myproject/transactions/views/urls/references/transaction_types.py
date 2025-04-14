@@ -1,5 +1,5 @@
 from django.urls import path
-from ...views.references.transaction_type import (
+from ...references.transaction_type import (
     TransactionTypeListView,
     TransactionTypeCreateView,
     TransactionTypeDeleteView,

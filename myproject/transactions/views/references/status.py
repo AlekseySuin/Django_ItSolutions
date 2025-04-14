@@ -1,6 +1,6 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from ...models.status import Status
 from ...forms.status import StatusForm
+from .base import *
 from django.urls import reverse_lazy
 
 
@@ -9,19 +9,18 @@ class StatusBaseView:
     form_class = StatusForm
     success_url = reverse_lazy('references:status_list')
 
-
-class StatusListView(StatusBaseView, ListView):
-    template_name = 'transactions/references/list.html'
+# Можно добавить дополнительную логику для каждого случая при необходимости
+class StatusListView(StatusBaseView, ReferenceListView):
     context_object_name = 'statuses'
 
 
-class StatusCreateView(StatusBaseView, CreateView):
-    template_name = 'transactions/references/form.html'
+class StatusCreateView(StatusBaseView, ReferenceCreateView):
+    ...
 
 
-class StatusUpdateView(StatusBaseView, UpdateView):
-    template_name = 'transactions/references/form.html'
+class StatusUpdateView(StatusBaseView, ReferenceUpdateView):
+    ...
 
 
-class StatusDeleteView(StatusBaseView, DeleteView):
-    template_name = 'transactions/references/delete_confirm.html'
+class StatusDeleteView(StatusBaseView, ReferenceDeleteView):
+    ...

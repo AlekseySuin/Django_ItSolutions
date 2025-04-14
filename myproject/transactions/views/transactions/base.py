@@ -11,13 +11,13 @@ class TransactionMixin:
 
 
 class TransactionListView(TransactionMixin, ListView):
-    template_name = 'transactions/list.html'
+    template_name = 'transactions/transactions_list.html'
     context_object_name = 'transactions'
     paginate_by = 20
 
 
 class TransactionCreateView(TransactionMixin, CreateView):
-    template_name = 'transactions/form.html'
+    template_name = 'transactions/transaction_form.html'
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -25,7 +25,7 @@ class TransactionCreateView(TransactionMixin, CreateView):
 
 
 class TransactionUpdateView(TransactionMixin, UpdateView):
-    template_name = 'transactions/form.html'
+    template_name = 'transactions/transaction_form.html'
 
 
 class TransactionDeleteView(TransactionMixin, DeleteView):

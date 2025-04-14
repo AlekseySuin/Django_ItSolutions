@@ -1,5 +1,5 @@
 from django.urls import path
-from ...views.references.subcategory import (
+from ...references.subcategory import (
     SubCategoryListView,
     SubCategoryCreateView,
     SubCategoryDeleteView,

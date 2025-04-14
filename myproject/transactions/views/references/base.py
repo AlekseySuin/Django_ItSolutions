@@ -1,69 +1,37 @@
-from django.views.generic import View
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
-from django.contrib import messages
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
 
-class ReferenceBookView(View):
-    """Универсальный CRUD View для всех справочников"""
-    model = None  # Должно быть задано в наследнике
-    form_class = None  # Должно быть задано в наследнике
-    base_template = 'transactions/base.html'
-    list_url_name = None  # Например: 'references:status_list'
-
-    def get_queryset(self):
-        return self.model.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'model_meta': self.model._meta,
-            'object': getattr(self, 'object', None),
-            'object_list': self.get_queryset(),
-            'view': self,
-            'title': self.model._meta.verbose_name_plural,
-        }
-        context.update(kwargs)
-        return context
-
-    def get(self, request, pk=None, action=None):
-        context = {}
-
-        if action == 'create':
-            context['form'] = self.form_class()
-        elif action == 'edit' and pk:
-            item = get_object_or_404(self.model, pk=pk)
-            context['form'] = self.form_class(instance=item)
-        elif action == 'delete' and pk:
-            item = get_object_or_404(self.model, pk=pk)
-            item.delete()
-            messages.success(request, f'{self.model._meta.verbose_name} удален')
-            return redirect(self.get_success_url())
-
-        return render(
-            request,
-            self.get_template(action),
-            self.get_context_data(**context)
-        )
-
-    def post(self, request, pk=None, action=None):
-        form = self.form_class(
-            request.POST,
-            instance=self.model(pk=pk) if pk else None
-        )
-
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Изменения сохранены')
-            return redirect(self.get_success_url())
-
-        return render(
-            request,
-            self.get_template(action),
-            self.get_context_data(form=form)
-        )
+class ReferenceBaseView:
+    template_name = None  # Должен быть переопределен
+    success_url = None  # Должен быть переопределен
 
     def get_success_url(self):
-        return reverse(self.list_url_name)
+        return self.success_url or reverse_lazy(f'references:{self.model._meta.model_name}:list')
 
-    def get_template(self, action):
-        return f'transactions/references/{action}.html' if action else self.base_template
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model_name = self.model._meta.model_name
+        context['create_url'] = f'references:{model_name}:create'
+        context['update_url'] = f'references:{model_name}:update'
+        context['delete_url'] = f'references:{model_name}:delete'
+        context['list'] = f'references:{model_name}:list'
+        context['model_meta'] = self.model._meta
+        return context
+
+
+class ReferenceListView(ReferenceBaseView, ListView):
+    template_name = 'transactions/references/list.html'
+    context_object_name = 'object_list'
+
+
+class ReferenceCreateView(ReferenceBaseView, CreateView):
+    template_name = 'transactions/references/form.html'
+
+
+class ReferenceUpdateView(ReferenceBaseView, UpdateView):
+    template_name = 'transactions/references/form.html'
+
+
+class ReferenceDeleteView(ReferenceBaseView, DeleteView):
+    template_name = 'transactions/references/delete_confirm.html'

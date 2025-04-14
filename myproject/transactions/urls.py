@@ -1,6 +1,6 @@
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('transactions.urls.operations')),  # Основные операции
-    path('references/', include('transactions.urls.references')),  # Справочники
+    path('', include('transactions.views.urls.transactions')),
+    path('references/', include('transactions.views.urls.references')),
 ]

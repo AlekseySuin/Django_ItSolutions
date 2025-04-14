@@ -1,5 +1,5 @@
 from django.urls import path
-from myproject.transactions.views.references.category import (
+from ...references.category import (
     CategoryListView,
     CategoryCreateView,
     CategoryUpdateView,

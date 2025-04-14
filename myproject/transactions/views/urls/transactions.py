@@ -1,10 +1,12 @@
 from django.urls import path
-from ..views.transactions.base import (
+from ..transactions.base import (
     TransactionUpdateView,
     TransactionDeleteView,
     TransactionCreateView,
     TransactionListView
 )
+
+app_name = 'transactions'
 
 urlpatterns = [
     path('',

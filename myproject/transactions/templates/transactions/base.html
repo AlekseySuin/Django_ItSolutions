@@ -11,17 +11,17 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'transaction_list' %}">Учет ДДС</a>
+            <a class="navbar-brand" href="{% url 'transactions:list' %}">Учет ДДС</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'transaction_list' %}">Транзакции</a>
+                        <a class="nav-link" href="{% url 'transactions:list' %}">Транзакции</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'reference_books' %}">Справочники</a>
+                        <a class="nav-link" href="{% url 'references:status:list' %}">Справочники</a>
                     </li>
                 </ul>
             </div>

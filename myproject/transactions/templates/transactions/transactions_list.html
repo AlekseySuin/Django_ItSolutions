@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'transactions/base.html' %}
 
 {% block title %}Список транзакций{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Список транзакций</h1>
-    <a href="{% url 'transaction_create' %}" class="btn btn-success">
+    <a href="{% url 'transactions:create' %}" class="btn btn-success">
         <i class="bi bi-plus-circle"></i> Добавить
     </a>
 </div>
@@ -74,10 +74,10 @@
                 <td>{{ transaction.amount }} р.</td>
                 <td>{{ transaction.comment|default:""|truncatechars:20 }}</td>
                 <td>
-                    <a href="{% url 'transaction_update' transaction.pk %}" class="btn btn-sm btn-outline-primary">
+                    <a href="{% url 'transactions:update' transaction.pk %}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="{% url 'transaction_delete' transaction.pk %}" class="btn btn-sm btn-outline-danger">
+                    <a href="{% url 'transactions:delete' transaction.pk %}" class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash"></i>
                     </a>
                 </td>
@@ -101,13 +101,13 @@
             </a>
         </li>
         {% endif %}
-        
+
         {% for num in page_obj.paginator.page_range %}
         <li class="page-item {% if num == page_obj.number %}active{% endif %}">
             <a class="page-link" href="?page={{ num }}">{{ num }}</a>
         </li>
         {% endfor %}
-        
+
         {% if page_obj.has_next %}
         <li class="page-item">
             <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
