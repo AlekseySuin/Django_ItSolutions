@@ -1,6 +1,10 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 class ReferenceBaseView:
     template_name = None  # Должен быть переопределен
@@ -35,3 +39,30 @@ class ReferenceUpdateView(ReferenceBaseView, UpdateView):
 
 class ReferenceDeleteView(ReferenceBaseView, DeleteView):
     template_name = 'transactions/references/delete_confirm.html'
+
+    def post(self, request, *args, **kwargs):
+        logger.info(f"Начало обработки удаления для {self.model.__name__}")
+
+        # Проверяем, что кнопка удаления была нажата
+        if 'confirm_delete' not in request.POST:
+            logger.warning("Кнопка удаления не была нажата!")
+            return HttpResponseRedirect(self.get_success_url())
+
+        self.object = self.get_object()
+        logger.info(f"Объект для удаления: {self.object} (ID: {self.object.pk})")
+
+        try:
+            # Явное удаление объекта
+            delete_result = self.object.delete()
+            logger.info(f"Результат удаления: {delete_result}")
+
+            if delete_result[0] == 0:
+                logger.error("Объект не был удален!")
+            else:
+                logger.info(f"Успешно удалено {delete_result[0]} записей")
+
+        except Exception as e:
+            logger.error(f"Ошибка при удалении: {str(e)}")
+            raise
+
+        return HttpResponseRedirect(self.get_success_url())

@@ -9,13 +9,16 @@
     </div>
     
     <div class="card-body">
-        <form method="post">
+        <!-- Явно указываем action и метод POST -->
+        <form method="POST" action="{% url delete_url object.pk %}">
             {% csrf_token %}
-            <p>Вы уверены, что хотите удалить {{ model_meta.verbose_name }} <strong>{{ object.name }}</strong>?</p>
+            <p>Вы уверены, что хотите удалить {{ model_meta.verbose_name }}
+               <strong>{{ object.name }}</strong> (ID: {{ object.pk }})?</p>
             <p class="text-danger">Это действие нельзя отменить!</p>
-            
+
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-danger">
+                <!-- Добавляем name и value для кнопки -->
+                <button type="submit" name="confirm_delete" value="1" class="btn btn-danger">
                     <i class="bi bi-trash"></i> Удалить
                 </button>
                 <a href="{% url list %}" class="btn btn-secondary">

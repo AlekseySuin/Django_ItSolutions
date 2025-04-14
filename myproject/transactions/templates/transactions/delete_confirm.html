@@ -1,0 +1,32 @@
+{% extends "transactions/base.html" %}
+
+{% block title %}Удаление транзакции{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Подтверждение удаления</h4>
+    </div>
+    
+    <div class="card-body">
+        <!-- Убедитесь, что action ведет на правильный URL -->
+        <form method="POST" action="{% url 'transactions:delete' object.pk %}">
+            {% csrf_token %}
+            <p>Вы уверены, что хотите удалить транзакцию №{{object.id}} от
+               <strong>{{ object.record_date|date:"d.m.Y" }}</strong>
+               на сумму <strong>{{ object.amount }}</strong> ({{ object.category }})?</p>
+            <p class="text-danger">Это действие нельзя отменить!</p>
+
+            <div class="d-flex justify-content-between">
+                <!-- Изменим тип кнопки на submit -->
+                <button type="submit" name="confirm_delete" value="1" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Удалить
+                </button>
+                <a href="{% url 'transactions:list' %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 class StatusBaseView:
     model = Status
     form_class = StatusForm
-    success_url = reverse_lazy('references:status_list')
 
 # Можно добавить дополнительную логику для каждого случая при необходимости
 class StatusListView(StatusBaseView, ReferenceListView):

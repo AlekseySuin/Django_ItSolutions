@@ -1,30 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'transactions/base.html' %}
 
 {% block title %}{% if object %}Редактирование транзакции{% else %}Создание транзакции{% endif %}{% endblock %}
-
-{% block extra_js %}
-<script>
-$(document).ready(function() {
-    // Динамическое обновление подкатегорий при изменении категории
-    $('#id_category').change(function() {
-        const categoryId = $(this).val();
-        if (categoryId) {
-            $.ajax({
-                url: '{% url "load_subcategories" %}',
-                data: {
-                    'category_id': categoryId
-                },
-                success: function(data) {
-                    $('#id_subcategory').html(data);
-                }
-            });
-        } else {
-            $('#id_subcategory').html('<option value="">---------</option>');
-        }
-    });
-});
-</script>
-{% endblock %}
 
 {% block content %}
 <div class="card">
@@ -35,52 +11,165 @@ $(document).ready(function() {
         <form method="post">
             {% csrf_token %}
             <div class="row g-3">
+                <!-- Дата записи -->
                 <div class="col-md-6">
-                    {{ form.record_date.label_tag }}
-                    {{ form.record_date }}
+                    <label for="id_record_date" class="form-label">Дата записи:</label>
+                    <input type="date" name="record_date"
+                           value="{% if form.record_date.value %}{{ form.record_date.value|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
+                           class="form-control {% if form.record_date.errors %}is-invalid{% endif %}"
+                           id="id_record_date" required>
                     {% if form.record_date.errors %}
                         <div class="invalid-feedback d-block">
                             {{ form.record_date.errors.as_text }}
                         </div>
                     {% endif %}
                 </div>
+
+                <!-- Статус -->
                 <div class="col-md-6">
-                    {{ form.status.label_tag }}
-                    {{ form.status }}
+                    <label for="id_status" class="form-label">Статус:</label>
+                    <select name="status" class="form-select" id="id_status">
+                        {% for value, label in form.fields.status.choices %}
+                            <option value="{{ value }}"
+                                    {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
+
+                <!-- Тип транзакции -->
                 <div class="col-md-6">
-                    {{ form.transaction_type.label_tag }}
-                    {{ form.transaction_type }}
+                    <label for="id_transaction_type" class="form-label">Тип транзакции:</label>
+                    <select name="transaction_type" class="form-select" id="id_transaction_type">
+                        {% for value, label in form.fields.transaction_type.choices %}
+                            <option value="{{ value }}"
+                                    {% if form.transaction_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
+
+                <!-- Сумма -->
                 <div class="col-md-6">
-                    {{ form.amount.label_tag }}
-                    {{ form.amount }}
+                    <label for="id_amount" class="form-label">Сумма:</label>
+                    <input type="number" name="amount"
+                           value="{{ form.amount.value|default_if_none:'' }}"
+                           step="0.01" class="form-control {% if form.amount.errors %}is-invalid{% endif %}"
+                           id="id_amount" required>
                     {% if form.amount.errors %}
                         <div class="invalid-feedback d-block">
                             {{ form.amount.errors.as_text }}
                         </div>
                     {% endif %}
                 </div>
+
+                <!-- Категория -->
                 <div class="col-md-6">
-                    {{ form.category.label_tag }}
-                    {{ form.category }}
+                    <label for="id_category" class="form-label">Категория:</label>
+                    <select name="category" id="id_category" class="form-select" onchange="filterSubcategories()">
+                        <option value="">---------</option>
+                        {% for cat in form.fields.category.queryset %}
+                            <option value="{{ cat.pk }}"
+                                    {% if form.category.value|stringformat:"s" == cat.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
+
+                <!-- Подкатегория (дополнительное поле, не связанное напрямую с моделью) -->
                 <div class="col-md-6">
-                    {{ form.subcategory.label_tag }}
-                    {{ form.subcategory }}
+                    <label for="id_subcategory" class="form-label">Подкатегория:</label>
+                    <select name="subcategory" id="id_subcategory" class="form-select">
+                        <option value="">---------</option>
+                        {% if form.category.value %}
+                            {% with category_id=form.category.value %}
+                                {% for subcat in subcategories %}
+                                    {% if subcat.category_id == category_id %}
+                                        <option value="{{ subcat.pk }}"
+                                                {% if subcategory_id and subcategory_id|stringformat:"s" == subcat.pk|stringformat:"s" %}selected{% endif %}>
+                                            {{ subcat.name }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        {% endif %}
+                    </select>
                 </div>
+
+                <!-- Комментарий -->
                 <div class="col-12">
-                    {{ form.comment.label_tag }}
-                    {{ form.comment }}
+                    <label for="id_comment" class="form-label">Комментарий:</label>
+                    <textarea name="comment" class="form-control" id="id_comment"
+                              rows="3">{{ form.comment.value|default_if_none:'' }}</textarea>
                 </div>
+
+                <!-- Кнопки -->
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">
                         {% if object %}Сохранить{% else %}Создать{% endif %}
                     </button>
-                    <a href="{% url 'transaction_list' %}" class="btn btn-secondary">Отмена</a>
+                    <a href="{% url 'transactions:list' %}" class="btn btn-secondary">Отмена</a>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+// Все подкатегории для фильтрации на клиенте
+const allSubcategories = [
+    {% for subcat in subcategories %}
+        {id: {{ subcat.pk }}, category_id: {{ subcat.category_id }}, name: "{{ subcat.name|escapejs}}"},
+    {% endfor %}
+];
+
+function filterSubcategories() {
+    const categoryId = document.getElementById('id_category').value;
+    const subcategorySelect = document.getElementById('id_subcategory');
+
+    // Очищаем текущие опции, оставляя только пустой вариант
+    subcategorySelect.innerHTML = '<option value="">---------</option>';
+
+    if (categoryId) {
+        // Фильтруем подкатегории по выбранной категории
+        const filteredSubcategories = allSubcategories.filter(
+            subcat => subcat.category_id.toString() === categoryId
+        );
+
+        // Добавляем отфильтрованные подкатегории
+        filteredSubcategories.forEach(subcat => {
+            const option = document.createElement('option');
+            option.value = subcat.id;
+            option.textContent = subcat.name;
+            subcategorySelect.appendChild(option);
+        });
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    filterSubcategories();
+
+    // Устанавливаем сохраненное значение подкатегории, если оно есть
+    {% if subcategory_id %}
+        const subcategorySelect = document.getElementById('id_subcategory');
+        if (subcategorySelect) {
+            subcategorySelect.value = "{{ subcategory_id }}";
+        }
+    {% endif %}
+});
+</script>
+
+<noscript>
+    <style>
+        .card-body { padding-bottom: 2rem; }
+    </style>
+    <div class="alert alert-warning mt-3">
+        <strong>Внимание!</strong> JavaScript отключен. Для выбора подкатегории сначала сохраните
+        форму после выбора категории, затем отредактируйте транзакцию.
+    </div>
+</noscript>
 {% endblock %}

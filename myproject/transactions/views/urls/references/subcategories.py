@@ -6,7 +6,7 @@ from ...references.subcategory import (
     SubCategoryUpdateView
 )
 
-app_name = 'sub_category'
+app_name = 'subcategory'
 
 urlpatterns = [
     path('', SubCategoryListView.as_view(), name='list'),

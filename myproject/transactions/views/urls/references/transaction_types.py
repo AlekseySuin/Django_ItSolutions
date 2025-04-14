@@ -6,7 +6,7 @@ from ...references.transaction_type import (
     TransactionTypeUpdateView
 )
 
-app_name = 'transaction_type'
+app_name = 'transactiontype'
 
 urlpatterns = [
     path('', TransactionTypeListView.as_view(), name='list'),

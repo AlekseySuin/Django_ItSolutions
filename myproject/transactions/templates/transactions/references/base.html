@@ -10,7 +10,10 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'transactions:list' %}">Главная</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'references:status:list' %}">Справочники</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'references:status:list' %}">Статусы</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'references:category:list' %}">Категории</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'references:subcategory:list' %}">Под Категории</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'references:transactiontype:list' %}">Типы транзакций</a></li>
                 <li class="breadcrumb-item active">{{ model_meta.verbose_name_plural }}</li>
             </ol>
         </nav>
